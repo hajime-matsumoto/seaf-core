@@ -38,6 +38,10 @@ class Environment
      */
     private $helper;
 
+    /**
+     * コンポーネントネームスペース
+     */
+    private $component_ns_list = array( 'Seaf\\Component' );
 
     /**
      * 環境オブジェクトを初期化
@@ -61,14 +65,50 @@ class Environment
          */
         $this->helper->bind( $this->di, array(
             'register'     => 'register',
-            'isRegistered' => 'has',
-            'di'           => 'get'
+            'isRegistered' => 'has'
         ));
+
     }
 
     public function __construct( )
     {
         $this->init();
+    }
+
+    /**
+     * コンポーネントを登録する
+     */
+    public function registerComponents ( $list, $prefix = 'Seaf\\Component' )
+    {
+        foreach ( $list as $name ) {
+            $this->register( $name, $prefix.'\\'.ucfirst($name) ) ;
+
+            // コンポーネント呼び出し用のヘルパを用意する
+            $this->map( $name, function( ) use ( $name ) {
+                return $this->di($name);
+            });
+        }
+    }
+
+    public function di ( $name )
+    {
+        // DIに登録されていればそれを呼び出す
+        if( $this->di->has( $name ) ) {
+            return $this->di->get( $name );
+        }
+
+        // そうでなければコンポーネントネームスペースから探す
+        foreach ( $this->component_ns_list as $ns ) {
+
+            $class = rtrim($ns,'\\').'\\'.ucfirst( $name );
+
+            if ( class_exists( $class ) ) {
+                $this->register( $name, $class );
+                return $this->di->get( $name );
+            }
+        }
+
+        return false;
     }
 
 
@@ -79,6 +119,11 @@ class Environment
     {
         if( $this->helper->has( $name ) ) {
             return $this->helper->invokeArgs( $name, $params );
+        }
+
+        // コンポーネントを呼び出す
+        if ( $comp = $this->di( $name ) ) {
+            return $comp;
         }
 
         throw new UndefinedCall( $name );
