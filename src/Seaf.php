@@ -9,17 +9,13 @@
  * @license   MIT, http://seaf.hazime.org
  */
 
-namespace Seaf\Core;
 
-use Seaf\Core\Enviroment\Base;
+use Seaf\Core\Environment\Environment;
+use Seaf\Core\Loader\AutoLoader;
 
 
 /**
  * Seafメインクラス
- *
- * スタティックな呼び出しだけ可能
- * 内部的にはSeaf\Baseインスタンスを持ち
- * __callStaticを使用して処理を委譲している
  */
 class Seaf
 {
@@ -30,43 +26,27 @@ class Seaf
     const ENV_PRODUCTION='production';
 
     /**
-     * シングルトンインスタンス
      * @var object
      */
     static private $instance;
 
     /**
-     * Seaf\Baseオブジェクト
      * @var object
      */
-    private $base;
+    private $env;
 
     /**
      * 外部から呼び出さない用にコンストラクタは
      * privateにする
      */
-    private function __construct() 
+    private function __construct ( )
     {
-        $this->base = new Base();
+        $this->env = new Environment( );
 
-        // ロガーコンポーネントを登録
-        $this->base->register('logger','Seaf\Component\Logger', function($logger){
-            $logger->setName('Seaf');
+        // オートローダを登録する
+        $this->env->register( 'autoLoader', function( ) {
+            return AutoLoader::init( );
         });
-        // 有効化
-        $this->base->logger()->register();
-
-        $this->base->di('registry')->set('name','Seaf');
-
-
-        // ダンパ
-        $this->base->register('dumper','Seaf\Component\Dumper');
-
-        // デバッガ
-        $this->base->register('debugger','Seaf\Component\Debugger');
-
-        // HTTP
-        $this->base->register('http','Seaf\Component\Http');
     }
 
     /**
@@ -74,30 +54,23 @@ class Seaf
      *
      * @return object
      */
-    static public function getInstance () 
+    static public function getInstance ( )
     {
         if (self::$instance) return self::$instance;
 
-        self::$instance = new Seaf();
+        self::$instance = new Seaf( );
         return self::$instance;
     }
 
     /**
-     * それ以外の呼び出しはBaseクラスに委譲する。
-     * 委譲の方法はディスパッチャが管理する。
-     *
      * @param name  $name 
      * @param array  $params params
      * @return mixed
      */
-    static public function __callStatic($name, array $params = array()) 
+    static public function __callStatic ( $name, array $params = array( ) ) 
     {
         $seaf = self::getInstance();
-
-        return call_user_func_array(
-            array($seaf->base,$name),
-            $params
-        );
+        return call_user_func_array( array( $seaf->env, $name ), $params );
     }
 }
 

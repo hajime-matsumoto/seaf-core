@@ -11,7 +11,7 @@ class EnvironmentTest extends \PHPUnit_Framework_TestCase
         $this->assertInstanceOf('Seaf\Core\Environment\Environment',$env);
     }
 
-    public function testDI()
+    public function testSome()
     {
         $env = new Environment();
 
@@ -21,8 +21,13 @@ class EnvironmentTest extends \PHPUnit_Framework_TestCase
 
         $this->assertEquals( 8, $env->test( 2, 4) );
 
-        $env->init();
+    }
 
-        $this->assertEquals( 8, $env->test( 2, 4) );
+    public function testComponentSystem( )
+    {
+        $env = new Environment();
+
+        // systemコンポーネントを動的に呼び出す
+        $this->assertTrue( is_array( $env->system( )->iniGetAll( ) ) );
     }
 }
