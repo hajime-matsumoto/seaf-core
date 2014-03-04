@@ -12,3 +12,12 @@ $loader->addNamespace(
     null,
     dirname(__FILE__).'/Core'
 );
+
+/**
+ * Components
+ */
+$loader->addNamespace(
+    'Seaf\\Component\\',
+    null,
+    dirname(__FILE__).'/components'
+);
