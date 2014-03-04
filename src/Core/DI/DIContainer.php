@@ -42,7 +42,7 @@ class DIContainer extends Container
      */
     public function register( $name, $object, $cb = null)
     {
-        if (is_object($object)) {
+        if ( !is_callable($object) && is_object($object) ) {
             return parent::set($name, $object);
         }
         return $this->factory->set( $name, $object, $cb );

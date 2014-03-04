@@ -102,9 +102,14 @@ class Environment
 
             $class = rtrim($ns,'\\').'\\'.ucfirst( $name );
 
-            if ( class_exists( $class ) ) {
-                $this->register( $name, $class );
-                return $this->di->get( $name );
+            // Component\Yaml\Yamlみたいな奴を解決する
+            $class2 = $class.'\\'.ucfirst($name);
+
+            foreach ( array( $class, $class2 ) as $class ) {
+                if ( class_exists( $class ) ) {
+                    $this->register( $name, $class );
+                    return $this->di->get( $name );
+                }
             }
         }
 

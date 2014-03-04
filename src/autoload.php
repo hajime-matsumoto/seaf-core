@@ -21,3 +21,10 @@ $loader->addNamespace(
     null,
     dirname(__FILE__).'/components'
 );
+
+/**
+ * bundle
+ */
+foreach ( glob(dirname(__FILE__).'/bundle/*/src/autoload.php') as $file ) {
+    require_once $file;
+}
