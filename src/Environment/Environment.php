@@ -28,11 +28,6 @@ use Seaf\Core\Factory\Factory;
 class Environment
 {
     /**
-     * ファクトリオブジェクト
-     */
-    private $factory;
-
-    /**
      * DIコンテナ
      * @var object
      */
@@ -56,8 +51,8 @@ class Environment
          * ヘルパメソッドを登録する
          */
         $this->helper->bind( $this->helper, array(
-            'bind' => 'bind',
-            'map' => 'map',
+            'bind'    => 'bind',
+            'map'     => 'map',
             'isMaped' => 'has'
         ));
 
@@ -65,9 +60,9 @@ class Environment
          * DI操作メソッドを登録する
          */
         $this->helper->bind( $this->di, array(
-            'register' => 'register',
+            'register'     => 'register',
             'isRegistered' => 'has',
-            'di' => 'get'
+            'di'           => 'get'
         ));
     }
 
@@ -96,7 +91,7 @@ class UndefinedCall extends \Exception
 {
     public function __construct( $key )
     {
-        parent::__construct( sprintf( "%sは存在しないキーです", $key ) );
+        parent::__construct( sprintf( "%sは解決できない呼び出しです", $key ) );
     }
 }
 
