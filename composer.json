@@ -1,0 +1,24 @@
+{
+  "name": "hajime-matsumoto/seaf-core",
+  "description": "Simple Easy Acceptable Framework Core Library",
+  "keywords": ["framework"],
+  "type": "library",
+  "license": "MIT",
+  "homepage": "http://hazime.org",
+  "authors": [
+    {
+      "name": "Hajime Matsumoto",
+      "email": "mail@hazime.org"
+    }
+  ],
+  "require": {
+  },
+  "require-dev": {
+    "phpunit/phpunit": "3.7.*",
+    "phpdocumentor/phpdocumentor": "2.*"
+  },
+  "autoload": {
+    "psr-0": { "Seaf\\Core": "src/" },
+    "files": [ "src/autoload.php" ]
+  }
+}
