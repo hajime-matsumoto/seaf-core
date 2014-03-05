@@ -66,7 +66,7 @@ default:
 development:
   project:
     name: Seaf Project(development)
-production
+production:
   project:
     name: Seaf Project(production)
 EOF
@@ -81,7 +81,7 @@ define('APP_COMPONENT_PATH', APP_ROOT_PATH.'/component');
 define('APP_CONFIG_PATH', APP_ROOT_PATH.'/config');
 
 Seaf::autoLoader( )->addLibraryPath( APP_LIB_PATH );
-Seaf::config(APP_ENV)->load( APP_CONFIG_PATH.'/setting.yaml' );
+Seaf::config()->load( APP_CONFIG_PATH.'/setting.yaml' );
 EOF
 
 echo "src/public/index.php"

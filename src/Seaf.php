@@ -47,6 +47,8 @@ class Seaf
         $this->env->register( 'autoLoader', function( ) {
             return AutoLoader::init( );
         });
+
+        $this->env->setEnvMode( self::ENV_DEVELOPMENT );
     }
 
     /**
