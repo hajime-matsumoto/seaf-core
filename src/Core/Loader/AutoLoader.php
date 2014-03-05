@@ -18,6 +18,7 @@ class Autoloader
 {
     private static $instance;
     private $ns_list = array();
+    private $path_list = array();
 
     /**
      * シングルトンインスタンスを返す
@@ -33,11 +34,16 @@ class Autoloader
      */
     public function __construct( )
     {
-        spl_autoload_register(
-            array(
-                $this,'library'
-            )
-        );
+        spl_autoload_register( array($this,'seaf') );
+        spl_autoload_register( array($this,'library') );
+    }
+
+    /**
+     * ライブラリパスを追加する
+     */
+    public function addLibraryPath( $path )
+    {
+        $this->path_list[$path] = $path;
     }
 
     /**
@@ -57,6 +63,27 @@ class Autoloader
      * ライブラリを検索する
      */
     public function library( $class )
+    {
+        $pathList = $this->path_list;
+
+        foreach( $pathList as $path )
+        {
+            $filename = $path.'/'.str_replace('\\','/', $class );
+            $filenames = array( $filename.".php", $filename."/".ucfirst(basename($filename)).".php" );
+
+            foreach ( $filenames as $file ) {
+                if( file_exists($file) ) {
+                    require_once $file;
+                    return true;
+                }
+            }
+        }
+    }
+
+    /**
+     * SEAFライブラリを検索する
+     */
+    public function seaf( $class )
     {
         /**
          * 一致する定義を取得

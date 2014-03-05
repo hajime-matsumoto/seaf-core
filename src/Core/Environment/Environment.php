@@ -19,6 +19,7 @@
 
 namespace Seaf\Core\Environment;
 
+use Seaf;
 use Seaf\Core\DI\DIContainer;
 use Seaf\Core\Factory\Factory;
 
@@ -27,6 +28,11 @@ use Seaf\Core\Factory\Factory;
  */
 class Environment
 {
+    /**
+     * モード
+     */
+    private $mode_name = null;
+
     /**
      * DIコンテナ
      * @var object
@@ -81,6 +87,25 @@ class Environment
     {
         $this->init();
     }
+
+    /**
+     * EnvNameを設定する
+     */
+    public function setEnvMode( $mode )
+    {
+        $this->mode_name = $mode;
+    }
+
+    /**
+     * EnvNameを取得する
+     */
+    public function getEnvMode(  )
+    {
+        if( is_null($this->mode_name) ) return Seaf::getEnvMode( );
+        return $this->mode_name;
+    }
+
+
 
     /**
      * コンポーネントを登録する

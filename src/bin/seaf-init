@@ -1,0 +1,120 @@
+#!/bin/bash
+
+BINDIR=$(cd $(dirname $0); pwd)
+SRCDIR=$(cd $(dirname $0)/..; pwd)
+TARGET=$(pwd)
+
+
+echo " ディレクトリ作成 ";
+
+mkdir -vp $TARGET/etc
+mkdir -vp $TARGET/src
+mkdir -vp $TARGET/src/component
+mkdir -vp $TARGET/src/view
+mkdir -vp $TARGET/src/lib
+mkdir -vp $TARGET/src/public
+mkdir -vp $TARGET/src/config
+mkdir -vp $TARGET/tmp
+mkdir -vp $TARGET/tmp/cache
+chmod 777 $TARGET/tmp/cache
+mkdir -vp $TARGET/logs
+
+echo " apache2.conf作成 "
+cat <<EOF | tee $TARGET/etc/apache2.conf
+<VirtualHost *:8080>
+ServerName $(basename $TARGET)
+	DocumentRoot $TARGET/src/public
+
+	CustomLog $TARGET/logs/apache.access.log common
+	ErrorLog $TARGET/logs/apache.error.log
+</VirtualHost>
+EOF
+
+echo " nginx.conf作成 "
+cat <<EOF | tee $TARGET/etc/nginx.conf
+server {
+	listen 80;
+
+	access_log $TARGET/logs/nginx.access.log;
+	error_log $TARGET/logs/nginx.error.log;
+
+	root $TARGET/public;
+	index index.php index.html;
+
+	server_name $(basename $TARGET);
+
+	location ~ \.php$ {
+		fastcgi_pass unix:/var/run/php5-fpm.sock;
+		fastcgi_param SCRIPT_FILENAME $document_root$fastcgi_script_name;
+		include fastcgi_params;
+		fastcgi_pass_header "X-Accel-Redirect";
+		fastcgi_pass_header "X-Accel-Expires";
+	}
+}
+EOF
+
+echo " スクリプト作成 ";
+
+echo "src/config/setting.yaml"
+cat <<EOF | tee src/config/setting.yaml
+default:
+  project:
+    name: Seaf Project
+      root_path: {{APP_ROOT_PATH}}
+      view_path: {{APP_ROOT_PATH}}/view
+      cache_path: {{APP_ROOT_PATH}}/tmp/cache
+development:
+  project:
+    name: Seaf Project(development)
+production:
+  project:
+    name: Seaf Project(production)
+EOF
+
+echo "src/bootstrap.php"
+cat <<EOF | tee src/bootstrap.php
+<?php
+require_once "$SRCDIR/autoload.php";
+
+define('APP_LIB_PATH', APP_ROOT_PATH.'/lib');
+define('APP_COMPONENT_PATH', APP_ROOT_PATH.'/component');
+define('APP_CONFIG_PATH', APP_ROOT_PATH.'/config');
+
+Seaf::autoLoader( )->addLibraryPath( APP_LIB_PATH );
+Seaf::config()->load( APP_CONFIG_PATH.'/setting.yaml' );
+EOF
+
+echo "src/public/index.php"
+cat <<EOF | tee src/public/index.php
+<?php
+define('APP_ROOT_PATH', realpath(dirname(__FILE__).'/../'));
+define('APP_ENV', 'development');
+
+require_once APP_ROOT_PATH.'/bootstrap.php';
+
+Seaf::web( )->route('/', function( \$env ) {
+	\$env->twig( )->render('index.twig');
+});
+
+Seaf::web( )->start( );
+EOF
+
+echo "src/view/index.twig"
+cat <<EOF | tee src/view/index.twig
+<html>
+	<head>
+		<link rel="stylesheet" href="/assets/style/app.css">
+		<script src="/assets/script/app.js">
+	</head>
+	<body>
+		<h1>hello seaf</h1>
+	</body>
+</html>
+EOF
+
+echo "check"
+
+php -f src/public/index.php
+
+echo "--------- 下記コマンドを実行してください ------------"
+echo "echo 'export PATH=$BINDIR:\$PATH' >> ~/.profile"
