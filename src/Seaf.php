@@ -70,7 +70,8 @@ class Seaf
     static public function __callStatic ( $name, array $params = array( ) ) 
     {
         $seaf = self::getInstance();
-        return call_user_func_array( array( $seaf->env, $name ), $params );
+
+        return $seaf->env->call( $name, $params );
     }
 }
 

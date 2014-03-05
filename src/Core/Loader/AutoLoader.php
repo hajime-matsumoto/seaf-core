@@ -65,12 +65,14 @@ class Autoloader
 
         foreach( $nsList as $ns=>$path )
         {
-            $file = $path.'/'.str_replace('\\','/',substr($class,strlen($ns))).'.php';
+            $filename = $path.'/'.str_replace('\\','/', $basename = substr($class,strlen($ns)));
+            $filenames = array( $filename.".php", $filename."/".ucfirst(basename($filename)).".php" );
 
-            if( file_exists($file) )
-            {
-                require_once $file;
-                return true;
+            foreach ( $filenames as $file ) {
+                if( file_exists($file) ) {
+                    require_once $file;
+                    return true;
+                }
             }
         }
     }

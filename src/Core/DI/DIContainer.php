@@ -13,6 +13,7 @@ namespace Seaf\Core\DI;
 
 use Seaf\Core\Base\Container;
 use Seaf\Core\Factory\Factory;
+use Seaf\Core\Environment\EnvironmentAcceptableIF;
 
 /**
  * 環境クラス
@@ -69,6 +70,11 @@ class DIContainer extends Container
         if (parent::has($name)) return parent::get($name);
 
         $instance = $this->factory->create($name);
+
+        if ( $instance instanceof EnvironmentAcceptableIF ) {
+            $instance->acceptEnvironment( $this->get('environment') );
+        }
+
         parent::update($name,$instance);
         return $instance;
     }

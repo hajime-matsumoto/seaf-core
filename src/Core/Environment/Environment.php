@@ -68,6 +68,13 @@ class Environment
             'isRegistered' => 'has'
         ));
 
+        /**
+         * DIにじぶんを登録する
+         */
+        $this->di->register('environment', $this);
+
+        $caller_ns = substr( get_class($this), 0, strrpos(get_class($this), '\\') );
+        $this->addComponentNamespace( $caller_ns.'\\Component' );
     }
 
     public function __construct( )
@@ -90,6 +97,17 @@ class Environment
         }
     }
 
+    /**
+     * コンポーネントのネームスペースを追加する
+     */
+    public function addComponentNamespace ( $ns )
+    {
+        array_unshift( $this->component_ns_list, $ns );
+    }
+
+    /**
+     * コンポーネント取得メソッド
+     */
     public function di ( $name )
     {
         // DIに登録されていればそれを呼び出す
@@ -105,7 +123,9 @@ class Environment
             // Component\Yaml\Yamlみたいな奴を解決する
             $class2 = $class.'\\'.ucfirst($name);
 
+
             foreach ( array( $class, $class2 ) as $class ) {
+
                 if ( class_exists( $class ) ) {
                     $this->register( $name, $class );
                     return $this->di->get( $name );
@@ -116,6 +136,14 @@ class Environment
         return false;
     }
 
+
+    /**
+     * コールハンドラ
+     */
+    public function call ( $name, $params ) 
+    {
+        return call_user_func_array( array( $this, $name ), $params );
+    }
 
     /**
      * ヘルパメソッドを有効にする
