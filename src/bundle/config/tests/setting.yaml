@@ -1,0 +1,21 @@
+default:
+  name: Seaf Project
+  author: Hajime MATSUMOTO
+  path: 
+    root: __APP_ROOT_PATH__
+    view: __APP_ROOT_PATH__/view
+    cache: __APP_ROOT_PATH__/tmp/cache
+  view:
+    engine: twig
+  long:
+    action:
+      trigger:
+        on: ok
+  runtime:
+    php:
+      path: /bin/php
+
+development:
+  name: Seaf Project(development)
+production:
+  name: Seaf Project(production)

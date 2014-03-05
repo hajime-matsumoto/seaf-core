@@ -1,6 +1,6 @@
 {
-  "name": "hajime-matsumoto/seaf-core",
-  "description": "Simple Easy Acceptable Framework Core Library",
+  "name": "hajime-matsumoto/seaf-config",
+  "description": "Simple Easy Acceptable Framework Config Library",
   "keywords": ["framework"],
   "type": "library",
   "license": "MIT",
@@ -12,14 +12,13 @@
     }
   ],
   "require": {
+    'hajime-matsumoto/seaf-core': '*',
+    'hajime-matsumoto/seaf-yaml': '*'
   },
   "require-dev": {
-    "phpunit/phpunit": "3.7.*",
-    "phpdocumentor/phpdocumentor": "2.*"
   },
   "autoload": {
-    "psr-0": { "Seaf\\Core": "src/" },
+    "psr-0": { "Seaf\\Config": "src/Config" },
     "files": [ "src/autoload.php" ]
   }
-  "bin": ["src/bin"]
 }
