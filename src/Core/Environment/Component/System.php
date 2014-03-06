@@ -21,7 +21,7 @@ class System
     /**
      * @var bool
      */
-    private $fake_exit = false;
+    private $fake = false;
 
     /**
      * @param object $env
@@ -38,8 +38,13 @@ class System
      * @param bool $replace
      * @param int $code
      */
-    public function sendHeader( $header, $replace = true,  $code = false )
+    public function header( $header, $replace = true,  $code = false )
     {
+        if ($this->fake) {
+            echo $header;
+            return;
+        }
+
         if( $code !== false ) {
             header( $header, $replace, $code );
         } else {
@@ -54,10 +59,11 @@ class System
      */
     public function halt( $message = null)
     {
-        if( $this->fake_exit === false ) {
-            exit($message);
+        if ($this->fake) {
+            echo $message;
+            return;
         }
-        echo $message;
+        exit($message);
     }
 
     /**
@@ -65,10 +71,9 @@ class System
      *
      * @param bool
      */
-    public function fakeExit( $flg = true)
+    public function useFake( $flg = true)
     {
-        $this->fake_exit = $flg;
-
+        $this->fake = true;
         return $this;
     }
 

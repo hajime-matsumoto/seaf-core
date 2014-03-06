@@ -71,7 +71,10 @@ class DIContainer extends Container
 
         $instance = $this->factory->create($name);
 
-        if ( $instance instanceof EnvironmentAcceptableIF ) {
+        if (
+            $instance instanceof EnvironmentAcceptableIF ||
+            method_exists($instance, 'acceptEnvironment')
+        ) {
             $instance->acceptEnvironment( $this->get('environment') );
         }
 
