@@ -22,7 +22,8 @@ class Util
     public function getNamespace ($object) 
     {
         $class = get_class($object);
-        $ns = substr($class, strrpos($class, '\\'));
+        $ns = substr($class, 0, strrpos($class, '\\'));
+
 
         return $ns;
     }
