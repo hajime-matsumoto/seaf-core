@@ -22,11 +22,31 @@ namespace Seaf\Core\Environment;
 use Seaf;
 use Seaf\Core\DI\DIContainer;
 use Seaf\Core\Factory\Factory;
+use Seaf\Core\Base\Container;
 
 /**
  * 環境クラス
+ * ========================
+ *
+ * メソッド拡張
+ * ----------------
+ *  Seaf::map(<name>,<function>)
+ *  Seaf::bind(<object>,[<name>,<method>])
+ *  Seaf::isMaped(<name) bool
+ *
+ * オブジェクトの登録
+ * ---------------
+ *  Seaf::register(<name>,<initializer>,<callback>)
+ *  Seaf::di(<name>) インスタンスの取得
+ *
+ * オートロードの仕組み
+ * --------------
+ * __NAMESPACE__.'\\Component'のネームスペースで
+ * 作られたクラスは
+ *  Seaf::di(<name>)
+ * で呼び出せる
  */
-class Environment
+class Environment extends Container
 {
     /**
      * モード
@@ -79,6 +99,10 @@ class Environment
          */
         $this->di->register('environment', $this);
 
+        /**
+         * 自分のネームスーペース+\\Componentをコンポーネントネームスペースとして
+         * 登録する
+         */
         $caller_ns = substr( get_class($this), 0, strrpos(get_class($this), '\\') );
         $this->addComponentNamespace( $caller_ns.'\\Component' );
     }
@@ -106,28 +130,13 @@ class Environment
     }
 
 
-
-    /**
-     * コンポーネントを登録する
-     */
-    public function registerComponents ( $list, $prefix = 'Seaf\\Component' )
-    {
-        foreach ( $list as $name ) {
-            $this->register( $name, $prefix.'\\'.ucfirst($name) ) ;
-
-            // コンポーネント呼び出し用のヘルパを用意する
-            $this->map( $name, function( ) use ( $name ) {
-                return $this->di($name);
-            });
-        }
-    }
-
     /**
      * コンポーネントのネームスペースを追加する
      */
     public function addComponentNamespace ( $ns )
     {
         array_unshift( $this->component_ns_list, $ns );
+        return $this->component_ns_list;
     }
 
     /**
@@ -197,5 +206,4 @@ class UndefinedCall extends \Exception
         parent::__construct( sprintf( "%sは解決できない呼び出しです", $key ) );
     }
 }
-
 /* vim: set expandtab ts=4 sw=4 sts=4: et*/

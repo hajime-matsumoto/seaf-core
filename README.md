@@ -24,3 +24,14 @@ Seaf Coreライブラリ
 		null,
 		dirname(__FILE__).'/components'
 	);
+
+TODO
+===================
+
+cliアプリ用のフレームワークを作る
+webアプリ用のコンポーネントを作る
+
+cacheハンドラを作る
+loggingハンドラを作る
+
+

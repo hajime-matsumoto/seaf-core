@@ -11,10 +11,12 @@
 
 namespace Seaf\Core\Loader;
 
+require_once dirname(__FILE__).'/NameSpaceListIterator.php';
+
 /**
  * オートローダ
  */
-class Autoloader
+class AutoLoader
 {
     private static $instance;
     private $ns_list = array();
@@ -40,14 +42,20 @@ class Autoloader
 
     /**
      * ライブラリパスを追加する
+     *
+     * @return int パスリストの数
      */
     public function addLibraryPath( $path )
     {
         $this->path_list[$path] = $path;
+
+        return count($this->path_list);
     }
 
     /**
      * ネームスペースを追加する
+     *
+     * @return int ネームスペースリストの数
      */
     public function addNamespace( $namespace, $script, $path )
     {
@@ -56,13 +64,15 @@ class Autoloader
             'scripts' => is_array($script) ? $script: array($script),
             'path' => $path
         );
+
+        return count($this->ns_list);
     }
 
 
     /**
      * ライブラリを検索する
      */
-    public function library( $class )
+    public function library ($class, $dry_run=false)
     {
         $pathList = $this->path_list;
 
@@ -73,6 +83,9 @@ class Autoloader
 
             foreach ( $filenames as $file ) {
                 if( file_exists($file) ) {
+                    if ($dry_run === true) {
+                        return $file;
+                    }
                     require_once $file;
                     return true;
                 }
@@ -83,7 +96,7 @@ class Autoloader
     /**
      * SEAFライブラリを検索する
      */
-    public function seaf( $class )
+    public function seaf($class, $dry_run=false)
     {
         /**
          * 一致する定義を取得
@@ -92,11 +105,21 @@ class Autoloader
 
         foreach( $nsList as $ns=>$path )
         {
-            $filename = $path.'/'.str_replace('\\','/', $basename = substr($class,strlen($ns)));
-            $filenames = array( $filename.".php", $filename."/".ucfirst(basename($filename)).".php" );
+            $filename = $path.'/'.ltrim(
+                str_replace('\\','/', $basename = substr($class,strlen($ns)))
+                ,'/'
+            );
+
+            $filenames = array(
+                $filename.".php",
+                $filename."/".ucfirst(basename($filename)).".php"
+            );
 
             foreach ( $filenames as $file ) {
                 if( file_exists($file) ) {
+                    if ($dry_run === true) {
+                        return $file;
+                    }
                     require_once $file;
                     return true;
                 }
@@ -104,73 +127,4 @@ class Autoloader
         }
     }
 }
-
-/**
- * Name Space を探す
- */
-class NameSpaceListIterator implements \Iterator
-{
-    private $ns_list = array();
-    private $ns_list_position = 0;
-    private $needle;
-
-    public function __construct( array $nsList, $class )
-    {
-        $this->ns_list = $nsList;
-        $this->needle = $class;
-    }
-
-    public function rewind( )
-    {
-        $this->ns_list_position = 0;
-    }
-
-    public function valid( )
-    {
-        $list = $this->ns_list;
-        $needle = $this->needle;
-
-        for ( $i = $this->ns_list_position; $i<count($list); $i++ )
-        {
-            $info = $list[$i];
-
-            // 一致する
-            if ( false !== ($p = strpos($needle, $info['ns']) ) )
-            {
-                if (!empty($info['scripts'])) 
-                {
-                    foreach ($info['scripts'] as $file)
-                    {
-                        if (!empty($file))
-                        {
-                            require_once $file;
-                        }
-                    }
-                }
-
-                $this->ns_list_position = $i;
-                return true;
-            }
-        }
-        return false;
-    }
-
-
-    public function current( )
-    {
-        return $this->ns_list[ $this->ns_list_position ]['path'];
-    }
-
-    public function key( )
-    {
-        return $this->ns_list[$this->ns_list_position]['ns'];
-    }
-
-
-    public function next( )
-    {
-        ++$this->ns_list_position;
-    }
-}
-
 /* vim: set expandtab ts=4 sw=4 sts=4: et*/

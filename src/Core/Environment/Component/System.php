@@ -9,9 +9,8 @@
  * @license   MIT, http://seaf.hazime.org
  */
 
-namespace Seaf\Component;
+namespace Seaf\Core\Environment\Component;
 
-use Seaf;
 use Seaf\Core\Environment\Environment;
 
 /**
@@ -41,12 +40,9 @@ class System
      */
     public function sendHeader( $header, $replace = true,  $code = false )
     {
-        if( $code !== false )
-        {
+        if( $code !== false ) {
             header( $header, $replace, $code );
-        }
-        else
-        {
+        } else {
             header( $header, $replace );
         }
     }
@@ -58,11 +54,9 @@ class System
      */
     public function halt( $message = null)
     {
-        if( $this->fake_exit === false )
-        {
+        if( $this->fake_exit === false ) {
             exit($message);
         }
-
         echo $message;
     }
 
