@@ -20,6 +20,11 @@ class Event
 {
     private $events = array();
 
+    public function init ()
+    {
+        $this->events = array();
+    }
+
     public function on ($event_name, $action, $object = null) 
     {
         if (is_object($object)) {

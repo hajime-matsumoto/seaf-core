@@ -19,15 +19,27 @@ namespace Seaf\Core\Environment\Component;
  */
 class Util
 {
-    public function getNamespace ($object) 
+    public function getNamespace ($class)
     {
-        $class = get_class($object);
+        if (is_object($class)) {
+            $class = get_class($class);
+        }
         $ns = substr($class, 0, strrpos($class, '\\'));
         return $ns;
     }
 
     public function arrayGet (array $array, $key, $default = null)
     {
+        if (false !== strpos($key,'.')) {
+            $token = strtok($key,'.');
+            do {
+                if (!isset($current[$token])) return $default;
+                $current =& $current[$token];
+            } while ($token = strtok($key,'.'));
+
+            return $current;
+        }
+
         return array_key_exists($key, $array) ?
             $array[$key]:
             $default;

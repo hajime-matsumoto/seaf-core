@@ -104,6 +104,9 @@ class Environment extends Container
          * 登録する
          */
         $caller_ns = substr( get_class($this), 0, strrpos(get_class($this), '\\') );
+        if ( $caller_ns != __NAMESPACE__ ) {
+            $this->addComponentNamespace(__NAMESPACE__.'\\Component' );
+        }
         $this->addComponentNamespace( $caller_ns.'\\Component' );
     }
 
