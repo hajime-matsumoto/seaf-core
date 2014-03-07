@@ -43,6 +43,8 @@ class Seaf
     {
         $this->env = new Environment( );
 
+        $this->env->setEnvMode(self::ENV_DEVELOPMENT);
+
         // オートローダを登録する
         $this->env->register( 'autoLoader', function( ) {
             return AutoLoader::init( );

@@ -95,6 +95,11 @@ class Container implements Iterator
         return isset($this->data[$key]);
     }
 
+    public function toArray( )
+    {
+        return $this->data;
+    }
+
     public function rewind( )
     {
         reset( $this->data );
